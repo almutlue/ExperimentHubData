@@ -6,10 +6,14 @@
 setClass("ExperimentHubMetadata",
     contains="HubMetadata",
     representation(
-        ExperimentHubRoot="character"
+        ExperimentHubRoot="character",
+        Publication="character",
+        AvailabelFrom="character"
     ),
     prototype = prototype(
-        ExperimentHubRoot=NA_character_
+        ExperimentHubRoot=NA_character_,
+        Publication=NA_character_,
+        AvailabelFrom=NA_character_
     )
 )
 
@@ -20,7 +24,8 @@ globalVariables(c("BiocVersion", "Coordinate_1_based", "DataProvider",
                   "Description", "DispatchClass", "Genome", "Location_Prefix",
                   "Maintainer", "RDataClass", "RDataDateAdded", "RDataPath",
                   "SourceType", "SourceUrl", "SourceVersion", "Species",
-                  "TaxonomyId", "Title", "PreparerClass"))
+                  "TaxonomyId", "Title", "PreparerClass", "Publication", 
+                  "AvailabelFrom"))
 
 makeExperimentHubMetadata <- function(pathToPackage, fileName=character())
 {
@@ -60,7 +65,9 @@ makeExperimentHubMetadata <- function(pathToPackage, fileName=character())
                                        RDataPath=.RDataPaths[[x]],
                                        DispatchClass=DispatchClass,
                                        PreparerClass=PreparerClass,
-                                       Location_Prefix=.Location_Prefix[[x]]))
+                                       Location_Prefix=.Location_Prefix[[x]]),
+                                       Publication=Publication,
+                                       AvailabelFrom=AvailabelFrom)
         }
     )
 }
@@ -120,6 +127,8 @@ ExperimentHubMetadata <-
         Notes=NA_character_,
         DispatchClass=NA_character_,
         PreparerClass=NA_character_,
+        Publication=NA_character_,
+        AvailabelFrom=NA_character_,
         Location_Prefix='http://s3.amazonaws.com/experimenthub/')
 {
     ## FIXME: move these checks to a general validity method
@@ -148,6 +157,8 @@ ExperimentHubMetadata <-
 
     AnnotationHubData:::.checkThatSingleStringAndNoCommas(SourceType)
     AnnotationHubData:::.checkThatSingleStringAndNoCommas(Location_Prefix)
+    AnnotationHubData:::.checkThatSingleStringOrNAAndNoCommas(Publication)
+    AnnotationHubData:::.checkThatSingleStringOrNAAndNoCommas(AvailabelFrom)
     AnnotationHubData:::.checkThatSingleStringOrNA(Genome)
     AnnotationHubData:::.checkThatSingleStringOrNA(Species)
     AnnotationHubData:::.checkThatSingleStringOrNAAndNoCommas(SourceVersion)
@@ -178,6 +189,8 @@ ExperimentHubMetadata <-
         Location_Prefix=Location_Prefix,
         DispatchClass=DispatchClass,
         PreparerClass=PreparerClass,
+        AvailabelFrom=AvailabelFrom,
+        Publication=Publication,
         ## FIXME: how to determine
         SourceSize=NA_real_,
         SourceMd5=NA_character_,
@@ -208,7 +221,8 @@ setMethod("show", "ExperimentHubMetadata",
                   "Species", "TaxonomyId", "Location_Prefix",
                   "RDataClass", "RDataDateAdded",
                   "RDataPath", "SourceLastModifiedDate", "SourceType",
-                  "SourceUrl", "SourceVersion", "Tags", "DispatchClass")) {
+                  "SourceUrl", "SourceVersion", "Tags", "DispatchClass", 
+                  "Publication", "AvailabelFrom")) {
         value <- slot(object, slt)
         txt <- paste0(slt, ": ", paste0(as.character(value), collapse=" "))
         cat(strwrap(txt), sep="\n  ")
